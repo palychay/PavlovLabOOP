@@ -17,9 +17,25 @@ void showMenu() {
 }
 
 void handleAddPlayer(Team& team) {
-    VolleyPlayer* player = new VolleyPlayer();
-    player->readFromConsole();
-    team.addPlayer(player);
+    int playerType;
+    cout << "1. Добавить обычного игрока\n2. Добавить нападающего\nВыберите тип игрока: ";
+    cin >> playerType;
+
+    shared_ptr<VolleyPlayer> player;
+
+    if (playerType == 1) {
+        player = make_shared<VolleyPlayer>();
+    }
+    else if (playerType == 2) {
+        player = make_shared<Attacker>();
+    }
+    else {
+        cout << "Неверный выбор.\n";
+        return;
+    }
+
+    player->readFromConsole();  // Виртуальный вызов
+    team.addPlayer(player);     // Добавление в контейнер "умных" указателей
 }
 
 void handleDisplayPlayers(const Team& team) {

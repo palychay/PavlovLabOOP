@@ -2,15 +2,16 @@
 
 #include <vector>
 #include "VolleyPlayer.h"
+#include <memory>
 
 using namespace std;
 
 class Team
 {
-    vector<VolleyPlayer*> players;
+    vector<shared_ptr<VolleyPlayer>> players;
 
 public:
-    void addPlayer(VolleyPlayer* player);
+    void addPlayer(shared_ptr<VolleyPlayer> player);
     void seePlayer() const;
     void readFromFile(const string& filename);
     void writeToFile(const string& filename) const;

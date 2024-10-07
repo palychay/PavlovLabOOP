@@ -2,12 +2,12 @@
 #include <fstream>
 #include <iostream>
 
-void Team::addPlayer(VolleyPlayer* player) {
+void Team::addPlayer(shared_ptr<VolleyPlayer> player) {
 	players.push_back(player);
 }
 
 void Team::seePlayer() const {
-	for (const VolleyPlayer* player: players){
+	for (const auto& player: players){
         player->writeToConsole();
 	}
 }
@@ -19,15 +19,20 @@ void Team::readFromFile(const string& filename) {
         return;
     }
 
-    VolleyPlayer* player = nullptr;
-    while (inFile) {
-        player = new VolleyPlayer();
-        player->readFromFile(inFile);
-        if (inFile) {
-            addPlayer(player);
+    string playerType;
+    while (inFile >> playerType) {
+        shared_ptr<VolleyPlayer> player;
+
+        if (playerType == "VolleyPlayer") {
+            player = make_shared<VolleyPlayer>();
         }
-        else {
-            delete player;
+        else if (playerType == "Attacker") {
+            player = make_shared<Attacker>();
+        }
+
+        if (player) {
+            player->readFromFile(inFile);  // Виртуальный вызов
+            addPlayer(player);
         }
     }
     inFile.close();
@@ -40,20 +45,24 @@ void Team::writeToFile(const string& filename) const {
         return;
     }
 
-    for (const VolleyPlayer* player : players) {
-        player->writeToFile(outFile);
+    for (const auto& player : players) {
+        if (dynamic_pointer_cast<Attacker>(player)) {
+            outFile << "Attacker" << endl;
+        }
+        else {
+            outFile << "VolleyPlayer" << endl;
+        }
+
+        player->writeToFile(outFile);  // Виртуальный вызов
     }
 
     outFile.close();
 }
 
 void Team::clearPlayers() {
-    for (VolleyPlayer* player : players) {
-        delete player;
-    }
     players.clear();
 }
 
 Team::~Team() {
-	clearPlayers();
+    clearPlayers();
 }
