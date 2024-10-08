@@ -1,6 +1,12 @@
 #include "Team.h"
 #include <fstream>
 #include <iostream>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/export.hpp>
+
+BOOST_CLASS_EXPORT(Attacker)
+BOOST_CLASS_EXPORT(VolleyPlayer)
 
 void Team::addPlayer(shared_ptr<VolleyPlayer> player) {
 	players.push_back(player);
@@ -15,49 +21,29 @@ void Team::seePlayer() const {
 void Team::readFromFile(const string& filename) {
     ifstream inFile(filename);
     if (!inFile) {
-        cerr << "Файл пуст." << endl;
+        cerr << "error." << endl;
         return;
     }
 
-    string playerType;
-    while (inFile >> playerType) {
-        shared_ptr<VolleyPlayer> player;
+    boost::archive::text_iarchive ia(inFile);
+    ia >> players;
 
-        if (playerType == "VolleyPlayer") {
-            player = make_shared<VolleyPlayer>();
-        }
-        else if (playerType == "Attacker") {
-            player = make_shared<Attacker>();
-        }
-
-        if (player) {
-            player->readFromFile(inFile);  // Виртуальный вызов
-            addPlayer(player);
-        }
-    }
     inFile.close();
 }
 
 void Team::writeToFile(const string& filename) const {
-    ofstream outFile(filename, ios::app);
+    ofstream outFile(filename);
     if (!outFile) {
-        cerr << "Файл пуст." << endl;
+        cerr << "error." << endl;
         return;
     }
 
-    for (const auto& player : players) {
-        if (dynamic_pointer_cast<Attacker>(player)) {
-            outFile << "Attacker" << endl;
-        }
-        else {
-            outFile << "VolleyPlayer" << endl;
-        }
-
-        player->writeToFile(outFile);  // Виртуальный вызов
-    }
+    boost::archive::text_oarchive oa(outFile);
+    oa << players;
 
     outFile.close();
 }
+
 
 void Team::clearPlayers() {
     players.clear();

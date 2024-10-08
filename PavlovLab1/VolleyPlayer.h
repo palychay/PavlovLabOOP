@@ -1,6 +1,10 @@
 #pragma once
-#include <string>;
+
+#include <string>
 #include <fstream>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/access.hpp>
+
 
 using namespace std;
 
@@ -19,20 +23,17 @@ public:
 
     virtual void readFromConsole();
     virtual void writeToConsole() const;
-    virtual void readFromFile(ifstream& in);
-    virtual void writeToFile(ofstream& out) const;
+    
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive& ar, const unsigned int version)
+    {
+        ar& name;
+        ar& height;
+        ar& weight;
+        ar& age;
+    }
 
-    virtual ~VolleyPlayer() = default;  // Виртуальный деструктор
+    virtual ~VolleyPlayer() = default;
 };
 
-class Attacker : public VolleyPlayer
-{
-    int power;
-    double jump;
-
-public:
-    void readFromConsole() override;
-    void writeToConsole() const override;
-    void readFromFile(ifstream& in) override;  // Переопределение чтения из файла
-    void writeToFile(ofstream& out) const override;  // Переопределение записи в файл
-};

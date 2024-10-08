@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <fstream>
 #include "Team.h"
 #include "Correct.h"
 #include <Windows.h>
@@ -19,7 +20,7 @@ void showMenu() {
 void handleAddPlayer(Team& team) {
     int playerType;
     cout << "1. Добавить обычного игрока\n2. Добавить нападающего\nВыберите тип игрока: ";
-    cin >> playerType;
+    playerType = get_correct(2, 1);
 
     shared_ptr<VolleyPlayer> player;
 
@@ -103,4 +104,3 @@ int main()
     
     return 0;
 }
-
